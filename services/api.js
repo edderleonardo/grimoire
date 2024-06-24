@@ -25,7 +25,18 @@ export const createRequest = async (request) => {
         console.error('Error al crear registro:', error);
         throw error;
     }
-}
+};
+
+export const updateRequest = async (id, request) => {
+    try {
+        const response = await apiClient.put(`/solicitud/${id}`, request);
+        console.log("🚀 ~ updateRequest ~ response:", response)
+        return response.data;
+    } catch (error) {
+        console.error('Error al actualizar registro:', error);
+        throw error;
+    }
+};
 
 export const deleteRequest = async (id) => {
     try {
@@ -35,6 +46,6 @@ export const deleteRequest = async (id) => {
         console.error('Error al eliminar registro:', error);
         throw error;
     }
-}
+};
 
 export { apiClient };

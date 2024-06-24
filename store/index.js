@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
-import { listRequests, createRequest, deleteRequest } from "~/services/api";
+import {
+  listRequests,
+  createRequest,
+  deleteRequest,
+  updateRequest,
+} from "~/services/api";
 
 export const userGrimoire = defineStore("grimoire", {
   state: () => ({
@@ -27,6 +32,17 @@ export const userGrimoire = defineStore("grimoire", {
       }
     },
 
+    async updateRequest(id, request) {
+      try {
+        const response = await updateRequest(id, request);
+        console.log("🚀 ~ updateRequest ~ response:", response);
+        const index = this.requests.findIndex((request) => request.id === id);
+        this.fetchRequest();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async deleteRequest(id) {
       try {
         await deleteRequest(id);
@@ -34,6 +50,6 @@ export const userGrimoire = defineStore("grimoire", {
       } catch (error) {
         console.error(error);
       }
-    }
+    },
   },
 });

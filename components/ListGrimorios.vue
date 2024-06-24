@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-end">
+    <div class="flex justify-end mb-5">
         <button type="button" @click="openModal"
             class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Agregar Solicitud
@@ -19,7 +19,7 @@
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     Grimorio</th>
                 <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-                    <span class="sr-only">Edit</span>
+                    <span class="">Acciones</span>
                 </th>
             </tr>
         </thead>
@@ -39,9 +39,10 @@
                     {{ request.grimorio ? request.grimorio : 'No asignado' }}
                 </td>
 
-                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a> | 
-                    <span @click="deteleR(request.id)" class="text-red-600 hover:text-red-900 pointer">Borrar</span>
+                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-0">
+                    <a href="#" @click.prevent="editRequest(request)"
+                        class="text-indigo-600 hover:text-indigo-900">Editar</a> |
+                    <span @click="deleteR(request.id)" class="text-red-600 hover:text-red-900 pointer">Borrar</span>
                 </td>
             </tr>
         </tbody>
@@ -56,14 +57,15 @@
                 class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                 <div class="">
                     <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Agregar Solicitud
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            {{ isEditMode ? 'Editar Solicitud' : 'Agregar Solicitud' }}
                         </h3>
                         <div class="mt-2">
-                            <p class="text-sm text-gray-500">Aquí puedes agregar los detalles de tu nueva solicitud.
-                            </p>
+                            <p class="text-sm text-gray-500">Aquí puedes {{ isEditMode ? 'editar' : 'agregar' }} los
+                                detalles de tu solicitud.</p>
                             <br>
                             <!-- Formulario para agregar solicitud -->
-                            <form @submit.prevent="" class="mt-5">
+                            <form @submit.prevent="handleSubmit" class="mt-5">
                                 <div class="mt-4">
                                     <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
                                     <input type="text" id="name" v-model="name" required
@@ -99,8 +101,10 @@
                                     </select>
                                 </div>
                                 <div class="mt-5 sm:mt-6">
-                                    <button type="submit" @click="create"
-                                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm">Agregar</button>
+                                    <button type="submit"
+                                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm">
+                                        {{ isEditMode ? 'Guardar Cambios' : 'Agregar' }}
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -125,17 +129,20 @@ import { storeToRefs } from 'pinia'
 const store = userGrimoire()
 const { requests } = storeToRefs(store)
 
-const name = defineModel('name')
-const lastname = defineModel('lastname')
-const id = defineModel('id')
-const age = defineModel('age')
-const role = defineModel('role')
-
+const name = ref('')
+const lastname = ref('')
+const id = ref('')
+const age = ref('')
+const role = ref('')
 
 const isModalOpen = ref(false);
+const isEditMode = ref(false);
+const currentRequest = ref(null);
 
 const openModal = () => {
     isModalOpen.value = true;
+    isEditMode.value = false;
+    resetForm();
 };
 
 const closeModal = () => {
@@ -149,9 +156,20 @@ const resetForm = () => {
     id.value = ''
     age.value = ''
     role.value = ''
+    currentRequest.value = null;
 }
 
-const create = () => {
+const handleSubmit = () => {
+    if (isEditMode.value) {
+        updateRequest()
+    } else {
+        createRequest()
+    }
+    closeModal()
+    resetForm()
+}
+
+const createRequest = () => {
     store.createRequest({
         name: name.value,
         last_name: lastname.value,
@@ -159,11 +177,31 @@ const create = () => {
         age: age.value,
         affinity: role.value
     })
-    closeModal()
-    resetForm()
 }
 
-const deteleR = (id) => {
+const editRequest = (request) => {
+    currentRequest.value = request;
+    name.value = request.name;
+    lastname.value = request.last_name;
+    id.value = request.identification;
+    age.value = request.age;
+    role.value = request.affinity;
+
+    isEditMode.value = true;
+    isModalOpen.value = true;
+}
+
+const updateRequest = () => {
+    store.updateRequest(currentRequest.value.id, {
+        name: name.value,
+        last_name: lastname.value,
+        identification: id.value,
+        age: age.value,
+        affinity: role.value
+    })
+}
+
+const deleteR = (id) => {
     // confirm modal
     store.deleteRequest(id)
 }
@@ -178,8 +216,4 @@ onMounted(() => {
 input[type="text"],
 select
   height: 40px
-  padding-left: 10px
-
-.pointer
-  cursor: pointer
 </style>
