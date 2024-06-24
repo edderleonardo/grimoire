@@ -39,11 +39,11 @@
                     {{ request.grimorio ? request.grimorio.name : 'No asignado' }}
                 </td>
 
-                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-0">
+                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-0">
                     <a href="#" @click.prevent="editRequest(request)"
                         class="text-indigo-600 hover:text-indigo-900">Editar</a> |
-                    <span @click="accept(request.id)" class="text-indigo-600 hover:text-indigo-900 pointer"> Aceptar solicitante </span> | 
                     <span @click="deleteR(request.id)" class="text-red-600 hover:text-red-900 pointer">Borrar</span>
+                    <span v-if="!request.grimorio" @click="accept(request.id)" class="text-indigo-600 hover:text-indigo-900 pointer"> | Aceptar solicitante </span> 
                 </td>
             </tr>
         </tbody>

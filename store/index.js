@@ -18,7 +18,10 @@ export const userGrimoire = defineStore("grimoire", {
     async fetchRequest() {
       try {
         const response = await listRequests();
-        this.requests = response.data;
+        const sorted = response.data.sort((a, b) => {
+          return new Date(a.created_at) - new Date(b.created_at);
+        });
+        this.requests = sorted;
       } catch (error) {
         console.error(error);
       }
