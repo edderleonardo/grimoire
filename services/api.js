@@ -48,4 +48,14 @@ export const deleteRequest = async (id) => {
     }
 };
 
+export const changeStatusRequest = async (id, status) => {
+    try {
+        const response = await apiClient.patch(`/solicitud/${id}/estatus`, { status });
+        return response.data;
+    } catch (error) {
+        console.error('Error al cambiar estado del registro:', error);
+        throw error;
+    }
+}
+
 export { apiClient };

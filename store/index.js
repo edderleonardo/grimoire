@@ -4,6 +4,7 @@ import {
   createRequest,
   deleteRequest,
   updateRequest,
+  changeStatusRequest,
 } from "~/services/api";
 
 export const userGrimoire = defineStore("grimoire", {
@@ -36,6 +37,16 @@ export const userGrimoire = defineStore("grimoire", {
       try {
         const response = await updateRequest(id, request);
         console.log("🚀 ~ updateRequest ~ response:", response);
+        const index = this.requests.findIndex((request) => request.id === id);
+        this.fetchRequest();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async changeStatusRequest(id, status) {
+      try {
+        const response = await changeStatusRequest(id, status);
         const index = this.requests.findIndex((request) => request.id === id);
         this.fetchRequest();
       } catch (error) {

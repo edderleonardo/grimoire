@@ -36,12 +36,13 @@
                     {{ request.status }}
                 </td>
                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ request.grimorio ? request.grimorio : 'No asignado' }}
+                    {{ request.grimorio ? request.grimorio.name : 'No asignado' }}
                 </td>
 
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-0">
                     <a href="#" @click.prevent="editRequest(request)"
                         class="text-indigo-600 hover:text-indigo-900">Editar</a> |
+                    <span @click="accept(request.id)" class="text-indigo-600 hover:text-indigo-900 pointer"> Aceptar solicitante </span> | 
                     <span @click="deleteR(request.id)" class="text-red-600 hover:text-red-900 pointer">Borrar</span>
                 </td>
             </tr>
@@ -201,6 +202,11 @@ const updateRequest = () => {
     })
 }
 
+const accept = (id) => {
+    // confirm modal
+    store.changeStatusRequest(id, 'Aprobado')
+}
+
 const deleteR = (id) => {
     // confirm modal
     store.deleteRequest(id)
@@ -216,4 +222,8 @@ onMounted(() => {
 input[type="text"],
 select
   height: 40px
+  padding-left: 10px
+
+.pointer
+  cursor: pointer
 </style>
